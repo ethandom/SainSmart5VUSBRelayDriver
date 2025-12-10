@@ -1,0 +1,1 @@
+savedcmd_/home/ethandom/SainSmart5VUSBRelayDriver/kmod/relay_driver.ko := ld -r -EL  -maarch64elf -z noexecstack --no-warn-rwx-segments --build-id=sha1  -T scripts/module.lds -o /home/ethandom/SainSmart5VUSBRelayDriver/kmod/relay_driver.ko /home/ethandom/SainSmart5VUSBRelayDriver/kmod/relay_driver.o /home/ethandom/SainSmart5VUSBRelayDriver/kmod/relay_driver.mod.o

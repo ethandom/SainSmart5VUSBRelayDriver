@@ -1,0 +1,1 @@
+savedcmd_/home/ethandom/SainSmart5VUSBRelayDriver/kmod/modules.order := {   echo /home/ethandom/SainSmart5VUSBRelayDriver/kmod/relay_driver.o; :; } > /home/ethandom/SainSmart5VUSBRelayDriver/kmod/modules.order
