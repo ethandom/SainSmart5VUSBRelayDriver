@@ -175,7 +175,7 @@ static int usbrelay_probe(struct usb_interface *intf, const struct usb_device_id
     pr_info("usbrelay: device initialized, /dev/usbrelay%d ready\n", minor);
     return 0;
 
-/* ---------- Error paths ---------- */
+/* error paths */
 error_device:
     device_destroy(usbrelay_class, dev->devt);
 
@@ -232,7 +232,7 @@ static struct usb_driver usbrelay_driver = {
     .disconnect = usbrelay_disconnect,
 };
 
-/* ---------- file_operations implementations ---------- */
+/* fops */
 
 static int usbrelay_open(struct inode *inode, struct file *file) {
     struct usbrelay *dev;
@@ -300,7 +300,7 @@ static ssize_t usbrelay_write(struct file *file, const char __user *buf, size_t 
 }
 
 
-/* ---------- module init/exit ---------- */
+/* Init / Exit */
 
 static int __init usbrelay_init(void) {
     int ret;
