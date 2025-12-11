@@ -40,7 +40,7 @@ static int usbrelay_major;
 static struct class *usbrelay_class;
 static DEFINE_IDA(usbrelay_ida);  /* allocate minors safely */
 
-/* Forward declarations */
+/* Fops forward declarations */
 static int usbrelay_open(struct inode *inode, struct file *file);
 static int usbrelay_release(struct inode *inode, struct file *file);
 static ssize_t usbrelay_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos);
