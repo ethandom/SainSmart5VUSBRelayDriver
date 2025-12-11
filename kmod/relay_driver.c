@@ -55,8 +55,7 @@ static const struct file_operations usbrelay_fops = {
 };
 
 /* Helper: push current relay_state to device via bulk OUT */
-static int usbrelay_push_state(struct usbrelay *dev)
-{
+static int usbrelay_push_state(struct usbrelay *dev) {
     int retval;
     int actual_len;
     u8 buf = dev->relay_state;
@@ -74,8 +73,7 @@ static int usbrelay_push_state(struct usbrelay *dev)
     return 0;
 }
 
-static int usbrelay_probe(struct usb_interface *intf, const struct usb_device_id *id)
-{
+static int usbrelay_probe(struct usb_interface *intf, const struct usb_device_id *id) {
     struct usbrelay *dev = NULL;
     struct usb_host_interface *iface_desc;
     struct usb_endpoint_descriptor *ep_desc;
@@ -197,8 +195,7 @@ error:
     return retval;
 }
 
-static void usbrelay_disconnect(struct usb_interface *intf)
-{
+static void usbrelay_disconnect(struct usb_interface *intf) {
     struct usbrelay *dev = usb_get_intfdata(intf);
 
     pr_info("usbrelay: disconnect() called for interface %u\n", intf->cur_altsetting->desc.bInterfaceNumber);
@@ -274,8 +271,7 @@ static ssize_t usbrelay_read(struct file *file, char __user *buf, size_t count, 
 }
 
 
-static ssize_t usbrelay_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
-{
+static ssize_t usbrelay_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos) {
     struct usbrelay *dev = file->private_data;
     u8 mask;
     int retval;
@@ -306,8 +302,7 @@ static ssize_t usbrelay_write(struct file *file, const char __user *buf, size_t 
 
 /* ---------- module init/exit ---------- */
 
-static int __init usbrelay_init(void)
-{
+static int __init usbrelay_init(void) {
     int ret;
 
     pr_info("usbrelay: module init\n");
@@ -344,8 +339,7 @@ static int __init usbrelay_init(void)
     return 0;
 }
 
-static void __exit usbrelay_exit(void)
-{
+static void __exit usbrelay_exit(void) {
     pr_info("usbrelay: module exit\n");
 
     usb_deregister(&usbrelay_driver);
