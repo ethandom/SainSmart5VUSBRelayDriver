@@ -1,1 +1,0 @@
-savedcmd_/home/ethandom/SainSmart5VUSBRelayDriver/kmod/Module.symvers :=  scripts/mod/modpost -M -m -a      -o /home/ethandom/SainSmart5VUSBRelayDriver/kmod/Module.symvers -T /home/ethandom/SainSmart5VUSBRelayDriver/kmod/modules.order -i Module.symvers -e 

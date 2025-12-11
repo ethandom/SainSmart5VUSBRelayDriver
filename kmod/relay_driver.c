@@ -237,8 +237,7 @@ static struct usb_driver usbrelay_driver = {
 
 /* ---------- file_operations implementations ---------- */
 
-static int usbrelay_open(struct inode *inode, struct file *file)
-{
+static int usbrelay_open(struct inode *inode, struct file *file) {
     struct usbrelay *dev;
 
     /* Get back to our usbrelay struct from the cdev */
@@ -249,22 +248,19 @@ static int usbrelay_open(struct inode *inode, struct file *file)
     return 0;
 }
 
-static int usbrelay_release(struct inode *inode, struct file *file)
-{
+static int usbrelay_release(struct inode *inode, struct file *file) {
     return 0;
 }
 
-static ssize_t usbrelay_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
-{
+static ssize_t usbrelay_read(struct file *file, char __user *buf, size_t count, loff_t *ppos) {
     struct usbrelay *dev = file->private_data;
     u8 mask;
 
     if (!dev)
         return -ENODEV;
-    if (*ppos > 0)
-        return 0;  // EOF on second read
+
     if (count < 1)
-        return -EINVAL;
+        return -EINVAL;  /* caller must request at least 1 byte */
 
     mutex_lock(&dev->lock);
     mask = dev->relay_state;
@@ -273,9 +269,10 @@ static ssize_t usbrelay_read(struct file *file, char __user *buf, size_t count, 
     if (copy_to_user(buf, &mask, 1))
         return -EFAULT;
 
-    *ppos = 1;
+    /* For a "state" device, we don't treat ppos as EOF; ignore or leave it. */
     return 1;
 }
+
 
 static ssize_t usbrelay_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
 {
@@ -287,7 +284,7 @@ static ssize_t usbrelay_write(struct file *file, const char __user *buf, size_t 
         return -ENODEV;
 
     if (count < 1)
-        return 0;              // nothing to do
+        return EINVAL;              // nothing to do
 
     if (copy_from_user(&mask, buf, 1))
         return -EFAULT;

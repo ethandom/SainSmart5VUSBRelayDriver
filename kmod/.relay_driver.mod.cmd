@@ -1,1 +1,0 @@
-savedcmd_/home/ethandom/SainSmart5VUSBRelayDriver/kmod/relay_driver.mod := printf '%s\n'   relay_driver.o | awk '!x[$$0]++ { print("/home/ethandom/SainSmart5VUSBRelayDriver/kmod/"$$0) }' > /home/ethandom/SainSmart5VUSBRelayDriver/kmod/relay_driver.mod

@@ -8,7 +8,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include "usbrelay.h"
+#include "../include/usbrelay.h"
 
 #ifndef PATH_MAX
 #define PATH_MAX    128
@@ -148,17 +148,14 @@ static void print_help(void) {
 
 /* Parse our arguments to determine if user made a valid call */
 
-static int parse_args(int argc, char **argv, struct relayctl_args *out_args) {
-    if (argc < 2) {
-        print_usage();
-        return 1;
-    }
+/* Parse our arguments to determine if user made a valid call */
 
+static int parse_args(int argc, char **argv, struct relayctl_args *out_args) {
     memset(out_args, 0, sizeof(*out_args));
-    out_args->cmd        = RELAYCTL_CMD_NONE;
-    out_args->channel    = 0;
-    out_args->state      = RELAYCTL_STATE_OFF;
-    out_args->mask       = 0;
+    out_args->cmd         = RELAYCTL_CMD_NONE;
+    out_args->channel     = 0;
+    out_args->state       = RELAYCTL_STATE_OFF;
+    out_args->mask        = 0;
     out_args->interactive = 0;
     out_args->verbose     = 0;
     strncpy(out_args->dev_path, USBRELAY_DEFAULT_DEVICE, PATH_MAX - 1);
@@ -187,11 +184,17 @@ static int parse_args(int argc, char **argv, struct relayctl_args *out_args) {
         }
     }
 
-    /* Now argv[i] should be protocol command */
+    /* Now argv[i] should be protocol command (unless interactive-only) */
     if (i >= argc) {
+        if (out_args->interactive) {
+            /* Interactive REPL with no initial command is allowed */
+            out_args->cmd = RELAYCTL_CMD_NONE;
+            return 0;
+        }
         print_usage();
         return 1;
     }
+
     const char *cmd = argv[i];
     i++;
 
@@ -287,6 +290,7 @@ static int parse_args(int argc, char **argv, struct relayctl_args *out_args) {
 
     return 0;
 }
+
 
 /* Helper 1 parse a channel argument "1".."4" */
 static int parse_channel_arg(const char *arg, int *out_channel) {
@@ -537,7 +541,7 @@ static int handle_help(void) {
 static int run_interactive(struct relay_context *ctx) {
     char line[USBRELAY_MAX_LINE_LEN];
     int exit_status = 0;
-
+    print_help();
     for (;;) {
         if (ctx->verbose) {
             fputs("> ", stdout);
