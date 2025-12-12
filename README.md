@@ -289,7 +289,7 @@ cd userspace/tools
 Look through the output to verify:
 
 * Masks and channel states match expectations
-* Error cases return the correct “ERR <CODE>” format
+* Error cases return the correct "ERR <CODE>" format
 * Exit statuses are 0 on success and non-zero on failure
 
 ---
