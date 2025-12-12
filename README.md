@@ -4,7 +4,7 @@ Custom Linux kernel driver and user-space tooling for a SainSmart 4-channel 5 V 
 
 The stack consists of:
 
-* A kernel module (usbrelay.ko) that
+* A kernel module (relay_driver.ko) that
 
   * Binds directly to the FTDI device (VID 0x0403, PID 0x6001)
   * Exposes a simple 1-byte mask ABI via /dev/usbrelayN
@@ -14,7 +14,7 @@ The stack consists of:
   * Speaks a line-oriented ASCII protocol
   * Translates commands like “set 1 on” into bit masks
 
-For protocol details, see PROTOCOL.md.
+For protocol details, see docs/PROTOCOL.md.
 
 ---
 
@@ -24,18 +24,21 @@ Typical structure (you may adjust as needed):
 
 * kmod/
 
-  * usbrelay.c – kernel module source
-  * Makefile – builds usbrelay.ko
+  * relay_driver.c – kernel module source
+  * Makefile – builds relay_driver.ko
 
 * userspace/
 
+  * Makefile – builds user-space tools
   * include/usbrelay.h – shared constants/macros for user space
   * tools/relayctl.c – CLI front-end
   * tools/test_relayctl.sh – functional test script
 
-* PROTOCOL.md – ASCII protocol + kernel mask ABI
+* docs/
 
-* README.md – this file
+  * PROTOCOL.md – ASCII protocol + kernel mask ABI
+
+* .gitignore, LICENSE, README.md – repository metadata
 
 ---
 
@@ -57,9 +60,9 @@ From kmod/:
 cd kmod
 make
 
-If successful you should see:
+If successful you should see a file:
 
-usbrelay.ko
+relay_driver.ko
 
 ### 3.2 User-space tool
 
@@ -77,7 +80,7 @@ You should get:
 ## 4. Handling conflicting FTDI drivers
 
 By default, generic FTDI drivers (ftdi_sio, usbserial) often bind to the device first.
-For this project you want this driver (usbrelay) to bind instead.
+For this project you want this driver (relay_driver) to bind instead.
 
 ### 4.1 Check currently loaded modules
 
@@ -98,12 +101,13 @@ For a permanent setup you could add blacklist rules in /etc/modprobe.d/, but tha
 From kmod/:
 
 cd kmod
-sudo insmod usbrelay.ko
+sudo insmod relay_driver.ko
 
 Check kernel logs:
 
 dmesg | grep usbrelay
-(or: sudo journalctl -k | grep usbrelay)
+or:
+sudo journalctl -k | grep usbrelay
 
 You should see messages about probe() and something like:
 
@@ -127,11 +131,11 @@ To allow a non-root user to use relayctl:
 
 1. Ensure the group exists:
 
-getent group usbrelay || sudo groupadd usbrelay
+   getent group usbrelay || sudo groupadd usbrelay
 
 2. Add your user to that group:
 
-sudo usermod -aG usbrelay "$USER"
+   sudo usermod -aG usbrelay "$USER"
 
 3. Log out and log back in so the new group membership is applied.
 
@@ -235,33 +239,33 @@ With -v you will see a “> ” prompt before each input line.
 
 ## 8. ASCII protocol summary
 
-The full definition is in PROTOCOL.md.
+The full definition is in docs/PROTOCOL.md.
 Quick summary:
 
 * Commands are case-insensitive, one per line, for example:
 
-set 1 on
-get 2
-write-mask 0x05
-read-mask
-reset
-ping
+  set 1 on
+  get 2
+  write-mask 0x05
+  read-mask
+  reset
+  ping
 
 * Typical success responses:
 
-OK
-OK CH=<n> STATE=<ON|OFF>
-OK MASK=0xHH
-OK VERSION=<ver> TOOL=<tool>
+  OK
+  OK CH=<n> STATE=<ON|OFF>
+  OK MASK=0xHH
+  OK VERSION=<ver> TOOL=<tool>
 
 * Typical error responses:
 
-ERR BAD_COMMAND ...
-ERR BAD_CHANNEL ...
-ERR BAD_STATE ...
-ERR BAD_MASK ...
-ERR DEVICE_UNAVAILABLE ...
-ERR INTERNAL_ERROR ...
+  ERR BAD_COMMAND ...
+  ERR BAD_CHANNEL ...
+  ERR BAD_STATE ...
+  ERR BAD_MASK ...
+  ERR DEVICE_UNAVAILABLE ...
+  ERR INTERNAL_ERROR ...
 
 Internally, the kernel ABI is just a 1-byte read/write mask; no extra framing.
 
@@ -285,7 +289,7 @@ cd userspace/tools
 Look through the output to verify:
 
 * Masks and channel states match expectations
-* Error cases return the correct ERR <CODE> format
+* Error cases return the correct “ERR <CODE>” format
 * Exit statuses are 0 on success and non-zero on failure
 
 ---
@@ -294,11 +298,11 @@ Look through the output to verify:
 
 To detach the driver and remove device nodes:
 
-sudo rmmod usbrelay
+sudo rmmod relay_driver
 
 Check that /dev/usbrelay* has disappeared and that logs show the disconnect:
 
-dmesg | grep usbrelay
+dmesg | egrep 'usbrelay|relay_driver'
 
 If you want the generic FTDI drivers back:
 
@@ -310,4 +314,4 @@ sudo modprobe ftdi_sio
 ## 11. License
 
 * Kernel module: MODULE_LICENSE("GPL").
-* Userspace tools and protocol: see source headers or LICENSE if present.
+* Userspace tools and protocol: see source headers or LICENSE.
